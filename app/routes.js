@@ -3,17 +3,17 @@ module.exports = function (app, passport, db) {
   // normal routes ===============================================================
 
   // show the home page (will also have our login links)
-  app.get('/', function (req, res) {
-    res.render('index.ejs');
-  });
+  // app.get('/', function (req, res) {
+  //   res.render('index.html');
+  // });
 
-  // PROFILE SECTION =========================
-  app.get('/profile', isLoggedIn, function (req, res) {
-    db.collection('messages').find().toArray((err, result) => {
+  //  SECTION =========================
+  app.get('/', isLoggedIn, function (req, res) {
+    db.collection('main').find().toArray((err, result) => {
       if (err) return console.log(err)
-      res.render('profile.ejs', {
+      res.render('index.ejs', {
         user: req.user,
-        messages: result
+        main: result
       })
     })
   });
@@ -24,51 +24,74 @@ module.exports = function (app, passport, db) {
     res.redirect('/');
   });
 
-  // message board routes ===============================================================
+  // POSTroutes ===============================================================
+  //refer to https://gist.github.com/rayterrill/8ca484fe0e6ecf820b51eebd766ceae8
   //===============================================================================
-  app.post('/messages', (req, res) => {
-    db.collection('messages').save({ name: req.body.name, msg: req.body.msg, thumbUp: 0, thumbDown: 0 }, (err, result) => {
+  app.post('/main', (req, res) => {
+    db.collection('main').save({
+      eventtitle: req.body.eventtitle,
+      eventlocation: req.body.eventlocation,
+      eventdate: req.body.eventdate,
+      eventdescription: req.body.eventdescription,
+      eventcapacity: req.body.eventcapacity
+      // eventimg: 0
+    }, (err, result) => {
       if (err) return console.log(err)
       console.log('saved to database')
-      res.redirect('/profile')
+      res.redirect('/')
     })
   })
-  // thumbup ==============================
-  app.put('/thumbup', (req, res) => {
-    db.collection('messages')
-      .findOneAndUpdate({ name: req.body.name, msg: req.body.msg }, {
-        $set: {
-          thumbUp: req.body.thumbUp + 1
-        }
 
-      }, {
-        sort: { _id: -1 },
-        upsert: true
-      }, (err, result) => {
-        if (err) return console.log(err)
-        console.log(result)
-        res.send(result)
-      })
+  app.post('/upload', (req, res) => {
+    db.collection('main').save({
+      eventtitle: req.body.eventtitle,
+      eventlocation: req.body.eventlocation,
+      eventdate: req.body.eventdate,
+      eventdescription: req.body.eventdescription,
+      eventcapacity: req.body.eventcapacity
+      // eventimg: 0
+    }, (err, result) => {
+      if (err) return console.log(err)
+      console.log('saved to database')
+      res.redirect('/')
+    })
   })
-  // thumbdown ==============================
-  app.put('/thumbdown', (req, res) => {
-    db.collection('messages')
-      .findOneAndUpdate({ name: req.body.name, msg: req.body.msg }, {
-        $set: {
-          thumbUp: req.body.thumbUp - 1
-        }
+  // // thumbup ==============================
+  // app.put('/thumbup', (req, res) => {
+  //   db.collection('main')
+  //     .findOneAndUpdate({ name: req.body.name, msg: req.body.msg }, {
+  //       $set: {
+  //         thumbUp: req.body.thumbUp + 1
+  //       }
 
-      }, {
-        sort: { _id: -1 },
-        upsert: true
-      }, (err, result) => {
-        if (err) return res.send(err)
-        res.send(result)
-      })
-  })
+  //     }, {
+  //       sort: { _id: -1 },
+  //       upsert: true
+  //     }, (err, result) => {
+  //       if (err) return console.log(err)
+  //       console.log(result)
+  //       res.send(result)
+  //     })
+  // })
+  // // thumbdown ==============================
+  // app.put('/thumbdown', (req, res) => {
+  //   db.collection('main')
+  //     .findOneAndUpdate({ name: req.body.name, msg: req.body.msg }, {
+  //       $set: {
+  //         thumbUp: req.body.thumbUp - 1
+  //       }
 
-  app.delete('/messages', (req, res) => {
-    db.collection('messages').findOneAndDelete({ name: req.body.name, msg: req.body.msg }, (err, result) => {
+  //     }, {
+  //       sort: { _id: -1 },
+  //       upsert: true
+  //     }, (err, result) => {
+  //       if (err) return res.send(err)
+  //       res.send(result)
+  //     })
+  // })
+
+  app.delete('/main', (req, res) => {
+    db.collection('main').findOneAndDelete({ name: req.body.name, msg: req.body.msg }, (err, result) => {
       if (err) return res.send(500, err)
       res.send('Message deleted!')
     })
@@ -89,9 +112,9 @@ module.exports = function (app, passport, db) {
 
   // process the login form
   app.post('/login', passport.authenticate('local-login', {
-    successRedirect: '/profile', // redirect to the secure profile section
+    successRedirect: '/', // redirect to the secure  section
     failureRedirect: '/login', // redirect back to the signup page if there is an error
-    failureFlash: true // allow flash messages
+    failureFlash: true // allow flash main
   }));
 
   // SIGNUP =================================
@@ -102,9 +125,9 @@ module.exports = function (app, passport, db) {
 
   // process the signup form
   app.post('/signup', passport.authenticate('local-signup', {
-    successRedirect: '/profile', // redirect to the secure profile section
+    successRedirect: '/', // redirect to the secure  section
     failureRedirect: '/signup', // redirect back to the signup page if there is an error
-    failureFlash: true // allow flash messages
+    failureFlash: true // allow flash main
   }));
 
   // =============================================================================
@@ -120,7 +143,7 @@ module.exports = function (app, passport, db) {
     user.local.email = undefined;
     user.local.password = undefined;
     user.save(function (err) {
-      res.redirect('/profile');
+      res.redirect('/');
     });
   });
 
