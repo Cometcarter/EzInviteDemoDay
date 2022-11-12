@@ -1,4 +1,4 @@
-module.exports = function (app, passport, db) {
+module.exports = function (app, passport, db, ObjectId) {
 
   // normal routes ===============================================================
 
@@ -8,7 +8,7 @@ module.exports = function (app, passport, db) {
   // });
 
   //  SECTION =========================
-  app.get('/', isLoggedIn, function (req, res) {
+  app.get('/', function (req, res) {
     db.collection('main').find().toArray((err, result) => {
       if (err) return console.log(err)
       res.render('index.ejs', {
@@ -28,6 +28,7 @@ module.exports = function (app, passport, db) {
   //refer to https://gist.github.com/rayterrill/8ca484fe0e6ecf820b51eebd766ceae8
   //===============================================================================
   app.post('/main', (req, res) => {
+    console.log(req.body)
     db.collection('main').save({
       eventtitle: req.body.eventtitle,
       eventlocation: req.body.eventlocation,
@@ -42,56 +43,49 @@ module.exports = function (app, passport, db) {
     })
   })
 
-  app.post('/upload', (req, res) => {
-    db.collection('main').save({
-      eventtitle: req.body.eventtitle,
-      eventlocation: req.body.eventlocation,
-      eventdate: req.body.eventdate,
-      eventdescription: req.body.eventdescription,
-      eventcapacity: req.body.eventcapacity
-      // eventimg: 0
-    }, (err, result) => {
-      if (err) return console.log(err)
-      console.log('saved to database')
-      res.redirect('/')
-    })
+  // thumbup ==============================
+  app.put('/main', (req, res) => {
+    db.collection('main')
+      .findOneAndUpdate({
+        _id: ObjectId(req.body._id)
+      }, {
+        $set: {
+          eventtitle: req.body.eventtitle,
+          eventlocation: req.body.eventlocation,
+          eventdate: req.body.eventdate,
+          eventdescription: req.body.eventdescription,
+          eventcapacity: req.body.eventcapacity
+        }
+
+      }, {
+        sort: { _id: -1 },
+        upsert: true
+      }, (err, result) => {
+        if (err) return console.log(err)
+        console.log(result)
+        res.send(result)
+      })
   })
-  // // thumbup ==============================
-  // app.put('/thumbup', (req, res) => {
-  //   db.collection('main')
-  //     .findOneAndUpdate({ name: req.body.name, msg: req.body.msg }, {
-  //       $set: {
-  //         thumbUp: req.body.thumbUp + 1
-  //       }
 
-  //     }, {
-  //       sort: { _id: -1 },
-  //       upsert: true
-  //     }, (err, result) => {
-  //       if (err) return console.log(err)
-  //       console.log(result)
-  //       res.send(result)
-  //     })
+  // app.post('/upload', (req, res) => {
+  //   db.collection('main').save({
+  //     eventtitle: req.body.eventtitle,
+  //     eventlocation: req.body.eventlocation,
+  //     eventdate: req.body.eventdate,
+  //     eventdescription: req.body.eventdescription,
+  //     eventcapacity: req.body.eventcapacity
+  //     // eventimg: 0
+  //   }, (err, result) => {
+  //     if (err) return console.log(err)
+  //     console.log('saved to database')
+  //     res.redirect('/')
+  //   })
   // })
-  // // thumbdown ==============================
-  // app.put('/thumbdown', (req, res) => {
-  //   db.collection('main')
-  //     .findOneAndUpdate({ name: req.body.name, msg: req.body.msg }, {
-  //       $set: {
-  //         thumbUp: req.body.thumbUp - 1
-  //       }
 
-  //     }, {
-  //       sort: { _id: -1 },
-  //       upsert: true
-  //     }, (err, result) => {
-  //       if (err) return res.send(err)
-  //       res.send(result)
-  //     })
-  // })
+
 
   app.delete('/main', (req, res) => {
-    db.collection('main').findOneAndDelete({ name: req.body.name, msg: req.body.msg }, (err, result) => {
+    db.collection('main').findOneAndDelete({ _id: ObjectId(req.body._id) }, (err, result) => {
       if (err) return res.send(500, err)
       res.send('Message deleted!')
     })

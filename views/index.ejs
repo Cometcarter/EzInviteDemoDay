@@ -26,6 +26,7 @@
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
   <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
   <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
@@ -44,7 +45,7 @@
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid d-flex align-items-center justify-content-between">
 
-      <a href="index.html" class="logo d-flex align-items-center  me-auto me-lg-0">
+      <a href="/" class="logo d-flex align-items-center  me-auto me-lg-0">
         <!-- Uncomment the line below if you also wish to use an image logo -->
         <!-- <img src="assets/img/logo.png" alt=""> -->
         <i class="bi bi-camera"></i>
@@ -53,37 +54,20 @@
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a href="index.html" class="active">Home</a></li>
-          <li><a href="about.html">About</a></li>
-          <li class="dropdown"><a href="#"><span>Trending</span> <i
-                class="bi bi-chevron-down dropdown-indicator"></i></a>
-            <ul>
-              <li><a href="gallery.html">Nature</a></li>
-              <li><a href="gallery.html">People</a></li>
-              <li><a href="gallery.html">Architecture</a></li>
-              <li><a href="gallery.html">Animals</a></li>
-              <li><a href="gallery.html">Sports</a></li>
-              <li><a href="gallery.html">Travel</a></li>
-              <li class="dropdown"><a href="#"><span>Sub Menu</span> <i
-                    class="bi bi-chevron-down dropdown-indicator"></i></a>
-                <ul>
-                  <li><a href="#">Sub Menu 1</a></li>
-                  <li><a href="#">Sub Menu 2</a></li>
-                  <li><a href="#">Sub Menu 3</a></li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-          <li><a href="services.html">Services</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href="/" class="active">Home</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="services.html">Types of Events</a></li>
+          <li><a href="upload.html">Upload an Event</a></li>
         </ul>
       </nav><!-- .navbar -->
 
       <div class="header-social-links">
-        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
-        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></i></a>
+        <% if (user) { %>
+          <a class="cta-btn" href="/logout">Logout</a>
+          <% } else { %>
+            <a class="cta-btn" href="/login">Login</a>
+            <a class="cta-btn" href="/signup">Sign Up</a>
+            <% }%>
       </div>
       <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
       <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
@@ -97,10 +81,10 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-lg-6 text-center">
-          <h2>I'm <span>Jenny Wilson</span> a Professional Photographer from New York City</h2>
+          <h2>This is <span>EzInvite</span> Lorem ipsum dolor, sit amet consectetur adipisicing elit.</h2>
           <p>Blanditiis praesentium aliquam illum tempore incidunt debitis dolorem magni est deserunt sed qui libero.
             Qui voluptas amet.</p>
-          <a href="contact.html" class="btn-get-started">Available for hire</a>
+          <a href="upload.html" class="btn-get-started">Upload an Event</a>
         </div>
       </div>
     </div>
@@ -108,9 +92,37 @@
 
   <main id="main" data-aos="fade" data-aos-delay="1500">
 
+
+
     <!-- ======= Gallery Section ======= -->
-    <section id="gallery" class="gallery">
-      <div class="container-fluid">
+    <section>
+      <ul class="d-flex flex-row flex-wrap">
+        <% for (let i=0; i<main.length; i++) {%>
+          <div class="card-body bg-light">
+            <h2 class="card-title">
+              <%= main[i].eventtitle%>
+            </h2>
+            <li class="card-text mb-2 text-muted container-back">
+              <p>
+                <%= main[i].eventlocation%>
+              </p>
+              <p>
+                <%= main[i].eventdate%>
+              </p>
+              <p>
+                <%= main[i].eventdescription%>
+              </p>
+              <p>
+                <%= main[i].eventcapacity%>
+              </p>
+              <button class="btn btn-light" type="button" onclick="editEvent('<%= main[i]._id%>')">Edit</button>
+              <button class="btn btn-light" type="button" onclick="deleteEvent('<%= main[i]._id%>')">Delete</button>
+            </li>
+          </div>
+
+          <% } %>
+      </ul>
+      <div class="container-fluid" id="gallery" class="gallery">
 
         <div class="row gy-4 justify-content-center">
           <div class="col-xl-3 col-lg-4 col-md-6">
@@ -313,7 +325,7 @@
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
-
+  <script src="main.js"></script>
 </body>
 
 </html>
